@@ -28,30 +28,4 @@ npm run dev
 
 ## Database Schema
 
-View the Entity Relationship Diagram to understand the database structure:
-
-![ERD Diagram](./docs/images/erd.html)
-
-Or open the interactive diagram in your browser:
-```
-open ./docs/images/erd.html
-```
-
-## API Documentation
-
-API documentation is available via Swagger UI when the server is running:
-
-```
-http://localhost:3002/api-docs
-```
-
-For more details, see [SWAGGER.md](./SWAGGER.md).
-
-## Features
-
-- **Multi-tenant architecture** with organizations and role-based access control (OWNER, ADMIN, MEMBER)
-- **Authentication** with JWT access tokens and rotating refresh tokens with reuse detection
-- **File uploads** to S3-compatible storage
-- **Project and task management** with status tracking and assignments
-- **Rate limiting** and security headers
-- **Error handling** with custom API error class and Zod validation
+![ERD Diagram](./docs/images/erd.png)
