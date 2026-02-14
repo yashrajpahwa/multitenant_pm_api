@@ -1,0 +1,124 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+model User {
+  id                  String               @id @default(auto()) @map("_id") @db.ObjectId
+  email               String               @unique
+  passwordHash        String
+  name                String?
+  memberships         Membership[]
+  createdProjects     Project[]            @relation("UserProjects")
+  assignedTasks       Task[]               @relation("UserTasks")
+  uploadedFiles       FileUpload[]         @relation("UserFiles")
+  refreshTokens       RefreshToken[]
+  passwordResetTokens PasswordResetToken[]
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+}
+
+model Org {
+  id            String         @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  memberships   Membership[]
+  projects      Project[]
+  files         FileUpload[]
+  refreshTokens RefreshToken[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Membership {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  orgId     String   @db.ObjectId
+  role      Role
+  user      User     @relation(fields: [userId], references: [id])
+  org       Org      @relation(fields: [orgId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, orgId])
+}
+
+model Project {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  orgId       String      @db.ObjectId
+  createdById String      @db.ObjectId
+  name        String
+  description String?
+  org         Org         @relation(fields: [orgId], references: [id])
+  createdBy   User        @relation("UserProjects", fields: [createdById], references: [id])
+  tasks       Task[]
+  files       FileUpload[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Task {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  projectId   String     @db.ObjectId
+  assigneeId  String?    @db.ObjectId
+  title       String
+  description String?
+  status      TaskStatus @default(TODO)
+  project     Project    @relation(fields: [projectId], references: [id])
+  assignee    User?      @relation("UserTasks", fields: [assigneeId], references: [id])
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model FileUpload {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  orgId        String   @db.ObjectId
+  projectId    String?  @db.ObjectId
+  uploadedById String   @db.ObjectId
+  key          String
+  url          String
+  contentType  String
+  size         Int
+  org          Org      @relation(fields: [orgId], references: [id])
+  project      Project? @relation(fields: [projectId], references: [id])
+  uploadedBy   User     @relation("UserFiles", fields: [uploadedById], references: [id])
+  createdAt    DateTime @default(now())
+}
+
+model RefreshToken {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  orgId     String?  @db.ObjectId
+  jti       String   @unique
+  tokenHash String
+  expiresAt DateTime
+  revokedAt DateTime?
+  user      User     @relation(fields: [userId], references: [id])
+  org       Org?     @relation(fields: [orgId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model PasswordResetToken {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  tokenHash String
+  expiresAt DateTime
+  usedAt    DateTime?
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}
