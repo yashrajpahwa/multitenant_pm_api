@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "mongodb"
-  url      = env("DATABASE_URL")
 }
 
 enum Role {
@@ -59,17 +58,17 @@ model Membership {
 }
 
 model Project {
-  id          String      @id @default(auto()) @map("_id") @db.ObjectId
-  orgId       String      @db.ObjectId
-  createdById String      @db.ObjectId
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  orgId       String       @db.ObjectId
+  createdById String       @db.ObjectId
   name        String
   description String?
-  org         Org         @relation(fields: [orgId], references: [id])
-  createdBy   User        @relation("UserProjects", fields: [createdById], references: [id])
+  org         Org          @relation(fields: [orgId], references: [id])
+  createdBy   User         @relation("UserProjects", fields: [createdById], references: [id])
   tasks       Task[]
   files       FileUpload[]
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 }
 
 model Task {
@@ -101,24 +100,24 @@ model FileUpload {
 }
 
 model RefreshToken {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String   @db.ObjectId
-  orgId     String?  @db.ObjectId
-  jti       String   @unique
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String    @db.ObjectId
+  orgId     String?   @db.ObjectId
+  jti       String    @unique
   tokenHash String
   expiresAt DateTime
   revokedAt DateTime?
-  user      User     @relation(fields: [userId], references: [id])
-  org       Org?     @relation(fields: [orgId], references: [id])
-  createdAt DateTime @default(now())
+  user      User      @relation(fields: [userId], references: [id])
+  org       Org?      @relation(fields: [orgId], references: [id])
+  createdAt DateTime  @default(now())
 }
 
 model PasswordResetToken {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String   @db.ObjectId
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String    @db.ObjectId
   tokenHash String
   expiresAt DateTime
   usedAt    DateTime?
-  user      User     @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
+  user      User      @relation(fields: [userId], references: [id])
+  createdAt DateTime  @default(now())
 }
